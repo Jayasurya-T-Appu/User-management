@@ -1,5 +1,4 @@
 const User = require('../models/userSchema')
-const Token = require('../models/Token')
 const bcrypt =  require('bcryptjs')
 const { generateToken } = require('../utils/TokenUtil')
 
@@ -25,22 +24,40 @@ const register = async(userData) =>{
     const newUser = new User({
         name, username, email, password: hasedPassword,role, tokens:[]
     })
-    const savedUser = await newUser.save()
-    const tokenValue = generateToken({id:savedUser._id, email:savedUser.email,  role:savedUser.role}) 
-    
-    const token = new Token({
-        userId : savedUser._id,
-        token:tokenValue,
-        type:'auth',
-        expiresAt:new Date(Date.now() + 3600 * 1000)
+    let createdUser = await newUser.save()
+    return { 
+        user: createdUser
+    };
+}
+
+const login = async(userData) =>{
+    const {username, password} = userData
+    const user = await User.findOne({username})
+    if(!user){
+        throw new Error("User Doesn't Exist")
+    }
+    const isValidPassword = await bcrypt.compare(password, user.password)
+    if(!isValidPassword){
+       throw new Error("Invalid Password")
+    }
+    const generatedToken = await generateToken({
+        username:user.username,
+        role : user.role
     })
-    const savedToken = await token.save()
-    savedUser.tokens.push(savedToken._id)
-    savedUser.save()
-    return { user: savedUser, token: tokenValue };
+    user.authToken = generatedToken
+    let updatedUser = await user.save()
+    if(!updatedUser){
+       throw  new Error("Failed to login")
+
+    }
+    return {
+        token :  generatedToken
+    }
+    
 }
 
 module.exports = {
     healthCheck,
-    register
+    register,
+    login
 }

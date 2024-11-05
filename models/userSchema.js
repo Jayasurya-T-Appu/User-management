@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const TokenSchema = require('./Token')
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -21,18 +20,38 @@ const userSchema = new mongoose.Schema({
     trim: true,
     match: [/\S+@\S+\.\S+/, "Invalid email format"],
   },
+  password:
+  {
+    type: String,
+    required: true,
+    minlength: 6
+  },
   role: {
     type: String,
     enum: ["user", "admin"],
     default: "user",
   },
-  tokens:[{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Token' 
-}]
+  authToken: {
+    type: String,
+    expiresAt: Date,
+    default:""
+  },
+  refreshToken: {
+    type: String,
+    expiresAt: Date,
+    default:""
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now
+  }
 },
-{
+  {
     timestamps: true,
-});
+  });
 
 module.exports = mongoose.model("User", userSchema)

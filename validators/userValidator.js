@@ -35,4 +35,15 @@ const registerValidatorSchema = Joi.object({
     })
 })
 
-module.exports = {registerValidatorSchema}
+const loginValidatorSchema = Joi.object({
+  username: Joi.string().required()
+  .messages({
+    'any.required': 'Username is required',
+  }),
+  password: Joi.string().required()
+  .messages({
+    'any.required': 'Password is required',
+  }),
+})
+
+module.exports = {registerValidatorSchema, loginValidatorSchema}
