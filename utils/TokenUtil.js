@@ -1,7 +1,6 @@
-const config = require('config')
 const jwt = require('jsonwebtoken')
-
-const SECRET_KEY = config.get("JWT_SECRET")
+require('dotenv').config();
+const SECRET_KEY = process.env.JWT_SECRET_KEY
 
 /**
  * Generates a JSON Web Token (JWT)

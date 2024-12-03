@@ -51,7 +51,7 @@ const login = async(userData) =>{
 
     }
     return {
-        token :  generatedToken
+        token :  `Bearer ${generatedToken}` 
     }
     
 }
