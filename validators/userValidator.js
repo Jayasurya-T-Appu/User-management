@@ -46,4 +46,32 @@ const loginValidatorSchema = Joi.object({
   }),
 })
 
-module.exports = {registerValidatorSchema, loginValidatorSchema}
+const passwordResetSchema = Joi.object({
+  email: Joi.string().email().required()
+  .messages({
+    'string.email': 'Please enter a valid email address',
+    'any.required': 'Email is required'
+  }),
+  old_password : Joi.string().required()
+  .messages({
+    'any.required': 'Password is required',
+  }),
+  new_password: Joi.string().min(8).required()
+    .pattern(/^[a-zA-Z0-9!@#$%^&*(),.?":{}|<>]*$/, 'valid characters')
+    .pattern(/(?=.*[A-Z])/, 'uppercase letter')
+    .pattern(/(?=.*[0-9])/, 'number')
+    .pattern(/(?=.*[!@#$%^&*(),.?":{}|<>])/, 'symbol')
+    .messages({
+      'string.min': 'Password must be at least 8 characters long',
+      'string.pattern.base': 'Password must contain at least one uppercase letter, one number, and one special symbol',
+      'any.required': 'Password is required',
+    }),
+  confirm_password : Joi.string().required().valid(Joi.ref('new_password'))
+  .messages({
+    'any.required': 'Confirmation password is required',
+    'any.only': 'Passwords must match'
+  })
+
+})
+
+module.exports = {registerValidatorSchema, loginValidatorSchema, passwordResetSchema}

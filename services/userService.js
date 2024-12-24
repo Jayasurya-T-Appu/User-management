@@ -56,8 +56,34 @@ const login = async(userData) =>{
     
 }
 
+const passwordReset = async (passwordResetData) => {
+    try {
+        const { email, old_password, new_password } = passwordResetData
+        const user = await User.findOne({ email })
+        if (!user) {
+            throw new Error("User Doesn't Exist")
+        }
+        const isValidPassword = await bcrypt.compare(old_password, user.password)
+        const isOldPassword = await bcrypt.compare(new_password, user.password)
+        if (!isValidPassword) {
+            throw new Error("Invalid Password")
+        }
+        if(isOldPassword){
+            throw new Error("New Password is same as Old Password")
+        }
+        const hasedPassword = await bcrypt.hash(new_password, 10)
+        user.password = hasedPassword
+        await user.save()
+        return true
+    } catch (error) {
+        throw error
+    }
+
+}
+
 module.exports = {
     healthCheck,
     register,
-    login
+    login,
+    passwordReset
 }
